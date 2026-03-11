@@ -1,0 +1,12 @@
+{
+  "user_count": 0,
+  "last_visit": null,
+  "total_views": 0,
+  "images": [
+    "assets/unnamed-1.jpg",
+    "assets/unnamed-2.jpg", 
+    "assets/unnamed-3.jpg",
+    "assets/unnamed-4.jpg"
+  ],
+  "current_image_index": 0
+}
