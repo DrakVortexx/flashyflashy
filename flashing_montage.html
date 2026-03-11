@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashing Montage</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .montage-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .flash-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('assets/unnamed-1.jpg');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            animation: flash 0.1s infinite;
+        }
+
+        .flash-image:nth-child(2) {
+            animation-delay: 0.05s;
+        }
+
+        .flash-image:nth-child(3) {
+            animation-delay: 0.025s;
+        }
+
+        .flash-image:nth-child(4) {
+            animation-delay: 0.075s;
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .intense-flash {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: intenseFlash 0.05s infinite;
+        }
+
+        @keyframes intenseFlash {
+            0%, 25%, 50%, 75%, 100% { opacity: 1; }
+            12.5%, 37.5%, 62.5%, 87.5% { opacity: 0; }
+        }
+
+        .strobe {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: strobe 0.02s infinite;
+        }
+
+        @keyframes strobe {
+            0%, 50% { opacity: 1; }
+            25%, 75% { opacity: 0; }
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .controls button {
+            margin: 5px;
+            padding: 10px 20px;
+            background: #00f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .controls button:hover {
+            background: #008;
+            transform: scale(1.05);
+        }
+
+        .controls button.active {
+            background: #0f0;
+        }
+
+        .monkey-svg {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="montage-container">
+        <!-- Your uploaded image will flash here -->
+
+        <!-- Multiple flashing layers -->
+        <div class="flash-image"></div>
+        <div class="flash-image"></div>
+        <div class="flash-image"></div>
+        <div class="flash-image"></div>
+    </div>
+
+    <div class="controls">
+        <h3 style="color: white; margin-top: 0;">Flash Controls</h3>
+        <button onclick="setMode('normal')" class="active" id="normalBtn">Normal Flash</button>
+        <button onclick="setMode('intense')" id="intenseBtn">Intense Flash</button>
+        <button onclick="setMode('strobe')" id="strobeBtn">Strobe Mode</button>
+        <button onclick="setMode('chaos')" id="chaosBtn">Chaos Mode</button>
+        <button onclick="toggleAnimation()" id="pauseBtn">Pause</button>
+    </div>
+
+    <script>
+        let currentMode = 'normal';
+        let isPaused = false;
+
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Remove all animation classes
+            const flashes = document.querySelectorAll('.flash-image');
+            flashes.forEach(flash => {
+                flash.className = 'flash-image';
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.controls button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Apply new mode
+            switch(mode) {
+                case 'intense':
+                    flashes.forEach((flash, index) => {
+                        flash.classList.add('intense-flash');
+                        flash.style.animationDelay = `${index * 0.01}s`;
+                    });
+                    document.getElementById('intenseBtn').classList.add('active');
+                    break;
+                    
+                case 'strobe':
+                    flashes.forEach((flash, index) => {
+                        flash.classList.add('strobe');
+                        flash.style.animationDelay = `${index * 0.005}s`;
+                    });
+                    document.getElementById('strobeBtn').classList.add('active');
+                    break;
+                    
+                case 'chaos':
+                    flashes.forEach((flash, index) => {
+                        flash.style.animationDuration = `${0.02 + Math.random() * 0.08}s`;
+                        flash.style.animationDelay = `${Math.random() * 0.1}s`;
+                    });
+                    document.getElementById('chaosBtn').classList.add('active');
+                    break;
+                    
+                default:
+                    document.getElementById('normalBtn').classList.add('active');
+            }
+        }
+
+        function toggleAnimation() {
+            isPaused = !isPaused;
+            const flashes = document.querySelectorAll('.flash-image');
+            const pauseBtn = document.getElementById('pauseBtn');
+            
+            if (isPaused) {
+                flashes.forEach(flash => {
+                    flash.style.animationPlayState = 'paused';
+                });
+                pauseBtn.textContent = 'Resume';
+                pauseBtn.style.background = '#f00';
+            } else {
+                flashes.forEach(flash => {
+                    flash.style.animationPlayState = 'running';
+                });
+                pauseBtn.textContent = 'Pause';
+                pauseBtn.style.background = '#00f';
+            }
+        }
+
+        // Add keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case '1': setMode('normal'); break;
+                case '2': setMode('intense'); break;
+                case '3': setMode('strobe'); break;
+                case '4': setMode('chaos'); break;
+                case ' ': toggleAnimation(); e.preventDefault(); break;
+            }
+        });
+
+        // Auto-cycle through modes for maximum flashing effect
+        let autoMode = false;
+        let modeIndex = 0;
+        const modes = ['normal', 'intense', 'strobe', 'chaos'];
+
+        function autoCycle() {
+            if (autoMode && !isPaused) {
+                modeIndex = (modeIndex + 1) % modes.length;
+                setMode(modes[modeIndex]);
+            }
+        }
+
+        // Press 'A' to toggle auto-cycle
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'a') {
+                autoMode = !autoMode;
+                if (autoMode) {
+                    setInterval(autoCycle, 2000); // Change mode every 2 seconds
+                }
+            }
+        });
+    </script>
+</body>
+</html>
